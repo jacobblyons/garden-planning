@@ -236,6 +236,45 @@
   .shop-col .qty{font-family:"JetBrains Mono",monospace;font-size:10px;text-align:right;color:var(--ink-2);letter-spacing:0.04em}
   .shop-col .sub-head{font-family:"JetBrains Mono",monospace;font-size:8.5px;letter-spacing:0.2em;text-transform:uppercase;color:var(--green);margin:10px 0 4px;padding-bottom:2px;border-bottom:1px solid var(--rule)}
   .shop-col .sub-head:first-child{margin-top:0}
+
+  /* Interactive shopping list — tap a row to check it off; state saves to localStorage */
+  .shop-col li{cursor:pointer;user-select:none;transition:opacity 0.15s ease,background-color 0.15s ease}
+  .shop-col li:hover{background:rgba(31,42,32,0.035)}
+  .shop-col li:active{background:rgba(31,42,32,0.07)}
+  .shop-col li.checked{opacity:0.48}
+  .shop-col li.checked .name,
+  .shop-col li.checked .name b,
+  .shop-col li.checked .name em,
+  .shop-col li.checked .qty{text-decoration:line-through;text-decoration-thickness:1px;text-decoration-color:var(--ink-2)}
+  .shop-col li .cb{position:relative;transition:background-color 0.15s ease,border-color 0.15s ease}
+  .shop-col li.checked .cb{background:var(--green);border-color:var(--green)}
+  .shop-col li.checked .cb::after{
+    content:"";position:absolute;left:2px;top:-1px;
+    width:3px;height:6px;
+    border:solid #fff;border-width:0 1.5px 1.5px 0;
+    transform:rotate(42deg);
+  }
+
+  /* Progress bar injected above the shopping grid */
+  #shop-progress{margin:18px 0 4px;display:flex;flex-direction:column;gap:6px}
+  #shop-progress .shop-progress-track{height:4px;background:rgba(31,42,32,0.12);border-radius:2px;overflow:hidden}
+  #shop-progress .shop-progress-fill{height:100%;background:var(--green);width:0;transition:width 0.25s ease}
+  #shop-progress .shop-progress-meta{display:flex;align-items:center;gap:12px;font-family:"JetBrains Mono",monospace;font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:var(--ink-2)}
+  #shop-progress .shop-clear{
+    margin-left:auto;background:none;border:1px solid var(--rule);
+    font-family:"JetBrains Mono",monospace;font-size:9.5px;letter-spacing:0.14em;
+    text-transform:uppercase;color:var(--ink-2);padding:4px 10px;cursor:pointer;
+    border-radius:2px;transition:color 0.15s ease,border-color 0.15s ease;
+  }
+  #shop-progress .shop-clear:hover{color:var(--ink);border-color:var(--ink)}
+
+  @media print{
+    .shop-col li{cursor:default}
+    .shop-col li.checked{opacity:1}
+    .shop-col li.checked .name,
+    .shop-col li.checked .qty{text-decoration:none}
+    #shop-progress{display:none}
+  }
   .shop-note{font-size:11px;color:var(--ink-2);line-height:1.45;margin-top:10px;padding:8px 12px;background:var(--paper-2);border-left:3px solid var(--green)}
   .shop-note b{color:var(--ink)}
   .shop-note + .shop-note{margin-top:6px}
@@ -787,16 +826,45 @@ body.site{
     max-height:68vh;
   }
 
-  /* Wide timelines & tables scroll horizontally rather than bleeding off-screen */
-  .site-main .succ,
-  .site-main .comp-tbl{ overflow-x:auto; -webkit-overflow-scrolling:touch; }
-  .site-main .succ-head{
-    grid-template-columns: 110px repeat(9, minmax(22px, 1fr)) 10px;
-    font-size:9px; letter-spacing:0.08em;
+  /* Succession timeline — horizontally scrollable, with the slot column
+     pinned so row labels stay visible as you drag the timeline. Forces a
+     min-width so month bars have room to actually be readable. */
+  .site-main .succ{
+    overflow-x:auto;
+    -webkit-overflow-scrolling:touch;
+    scrollbar-gutter:stable;
   }
-  .site-main .succ-row{ grid-template-columns: 110px 1fr; }
-  .site-main .succ-slot{ font-size:12px; padding-right:8px }
-  .site-main .succ-slot .tag{ font-size:8px }
+  .site-main .succ-head,
+  .site-main .succ-row{ min-width:720px; }
+  .site-main .succ-head{
+    grid-template-columns: 130px repeat(9, minmax(52px, 1fr)) 10px;
+  }
+  .site-main .succ-row{ grid-template-columns: 130px 1fr; }
+  .site-main .succ-head .sh.first,
+  .site-main .succ-slot{
+    position:sticky;
+    left:0;
+    background:var(--paper-2);
+    z-index:2;
+    box-shadow:1px 0 0 var(--rule);
+  }
+  .site-main .succ-slot{ font-size:12px; padding-right:10px; padding-left:2px; }
+  .site-main .succ-slot .tag{ font-size:8px; }
+
+  /* Hint: a faint fade on the right edge when there's more to scroll */
+  .site-main .succ{
+    background-image:
+      linear-gradient(to right, var(--paper-2) 30%, rgba(0,0,0,0)),
+      linear-gradient(to right, rgba(0,0,0,0), var(--paper-2) 70%) 100% 0,
+      radial-gradient(farthest-side at 0 50%, rgba(0,0,0,0.08), rgba(0,0,0,0)),
+      radial-gradient(farthest-side at 100% 50%, rgba(0,0,0,0.08), rgba(0,0,0,0)) 100% 0;
+    background-repeat:no-repeat;
+    background-size: 28px 100%, 28px 100%, 14px 100%, 14px 100%;
+    background-attachment: local, local, scroll, scroll;
+  }
+
+  /* Companion table on mobile — wrap if needed; table overflow is handled per-cell */
+  .site-main .comp-tbl{ font-size:12px; }
 
   /* Page-head title word breaks on narrow screens instead of overflowing */
   .page-head h1{ word-break: break-word; overflow-wrap: anywhere; }
@@ -821,6 +889,7 @@ body.site{
 <script>
 window.__mount = function(){
   document.getElementById('shop-body').innerHTML = window.GardenPlan.shoppingList();
+  window.GardenPlan.initShoppingChecks(document.getElementById('shop-body'));
 };
 </script>
 </div></main>
@@ -1557,12 +1626,17 @@ function bedPage_pots() {
 
 // ---------- SHOPPING LIST ----------
 function shoppingList() {
-  const li = (name, qty, sub) => `
-    <li>
+  const slug = str => String(str).replace(/<[^>]+>/g,'').replace(/\s+/g,' ').trim()
+    .toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+  const li = (name, qty, sub) => {
+    const key = slug(`${name}|${qty||''}|${sub||''}`);
+    return `
+    <li data-shop-key="${key}">
       <span class="cb"></span>
       <span class="name">${name}${sub ? `<em>${sub}</em>` : ''}</span>
       <span class="qty">${qty || ''}</span>
     </li>`;
+  };
 
   const startersCol = `
     <div class="shop-col">
@@ -2037,12 +2111,72 @@ function sitePlan() {
 
 
 
+// Click any shopping-list row to check it off. State persists in
+// localStorage under 'garden.shopping.checked', keyed by the slug built
+// in `shoppingList()`. A "clear all" button appears once anything is checked.
+function initShoppingChecks(root) {
+  const STORAGE_KEY = 'garden.shopping.checked';
+  root = root || document;
+  let saved = {};
+  try { saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}') || {}; } catch (_) {}
+
+  const items = root.querySelectorAll('li[data-shop-key]');
+  items.forEach(el => {
+    if (saved[el.dataset.shopKey]) el.classList.add('checked');
+  });
+
+  function updateProgressBar() {
+    const total = items.length;
+    const done = root.querySelectorAll('li[data-shop-key].checked').length;
+    const bar = root.querySelector('#shop-progress');
+    if (!bar) return;
+    bar.querySelector('.shop-progress-count').textContent = `${done} / ${total} checked`;
+    bar.querySelector('.shop-progress-fill').style.width = total ? `${(done/total)*100}%` : '0%';
+    bar.querySelector('.shop-clear').hidden = done === 0;
+  }
+
+  root.addEventListener('click', ev => {
+    const clearBtn = ev.target.closest('.shop-clear');
+    if (clearBtn) {
+      ev.preventDefault();
+      items.forEach(el => el.classList.remove('checked'));
+      localStorage.removeItem(STORAGE_KEY);
+      saved = {};
+      updateProgressBar();
+      return;
+    }
+    const li = ev.target.closest('li[data-shop-key]');
+    if (!li || !root.contains(li)) return;
+    const key = li.dataset.shopKey;
+    const on = li.classList.toggle('checked');
+    if (on) saved[key] = 1; else delete saved[key];
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(saved));
+    updateProgressBar();
+  });
+
+  // Inject the progress bar at the top of the shopping grid once.
+  const grid = root.querySelector('.shop-grid');
+  if (grid && !root.querySelector('#shop-progress')) {
+    const bar = document.createElement('div');
+    bar.id = 'shop-progress';
+    bar.innerHTML = `
+      <div class="shop-progress-track"><div class="shop-progress-fill"></div></div>
+      <div class="shop-progress-meta">
+        <span class="shop-progress-count"></span>
+        <button type="button" class="shop-clear" hidden>Clear all</button>
+      </div>`;
+    grid.parentNode.insertBefore(bar, grid);
+  }
+  updateProgressBar();
+}
+
 window.GardenPlan = {
   sitePlan, sitePlanAside,
   bed4x10_A, bed3x9_A, bed3x3_A,
   bedCard, notesA,
   bedPage_410, bedPage_39, bedPage_33, bedPage_pots,
-  shoppingList, harvestCues, succession
+  shoppingList, harvestCues, succession,
+  initShoppingChecks
 };
 
 </script>
