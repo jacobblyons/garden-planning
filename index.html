@@ -776,23 +776,27 @@ body.site{
 .site-main .bed{ min-width: 0; }
 
 @media (max-width: 880px){
-  html, body{ overflow-x: hidden; }
-
-  /* Center bed diagrams and cap height so 4×10 portrait SVGs don't dominate */
-  .site-main .bp-diagram{ display:flex; justify-content:center; }
+  /* Bed diagrams: let them fill the column width and scale vertically.
+     Explicit width:100% avoids iOS Safari quirks with width:auto + viewBox
+     (which sometimes falls back to the 300px default and anchors right). */
+  .site-main .bp-diagram{ text-align:center; }
   .site-main .bp-diagram > svg,
   .site-main .bp-diagram svg.bed-svg{
-    width:auto;
+    display:block;
+    width:100%;
     max-width:100%;
-    max-height:68vh;
+    height:auto;
+    margin:0 auto;
   }
 
-  /* Succession timeline — horizontally scrollable, with the slot column
-     pinned so row labels stay visible as you drag the timeline. Forces a
-     min-width so month bars have room to actually be readable. */
+  /* Succession timeline — horizontal scroll with the slot column pinned.
+     touch-action: pan-x pan-y tells iOS this element owns horizontal panning
+     so the gesture isn't swallowed by the page's vertical scroll. */
   .site-main .succ{
     overflow-x:auto;
+    overflow-y:hidden;
     -webkit-overflow-scrolling:touch;
+    touch-action: pan-x pan-y;
     scrollbar-gutter:stable;
   }
   .site-main .succ-head,
@@ -812,20 +816,10 @@ body.site{
   .site-main .succ-slot{ font-size:12px; padding-right:10px; padding-left:2px; }
   .site-main .succ-slot .tag{ font-size:8px; }
 
-  /* Hint: a faint fade on the right edge when there's more to scroll */
-  .site-main .succ{
-    background-image:
-      linear-gradient(to right, var(--paper-2) 30%, rgba(0,0,0,0)),
-      linear-gradient(to right, rgba(0,0,0,0), var(--paper-2) 70%) 100% 0,
-      radial-gradient(farthest-side at 0 50%, rgba(0,0,0,0.08), rgba(0,0,0,0)),
-      radial-gradient(farthest-side at 100% 50%, rgba(0,0,0,0.08), rgba(0,0,0,0)) 100% 0;
-    background-repeat:no-repeat;
-    background-size: 28px 100%, 28px 100%, 14px 100%, 14px 100%;
-    background-attachment: local, local, scroll, scroll;
-  }
-
-  /* Companion table on mobile — wrap if needed; table overflow is handled per-cell */
-  .site-main .comp-tbl{ font-size:12px; }
+  /* Companion table scrolls horizontally inside its own wrapper so wide rows
+     don't force the page to scroll. We wrap at render time via JS below. */
+  .site-main .comp-tbl-wrap{ overflow-x:auto; -webkit-overflow-scrolling:touch; }
+  .site-main .comp-tbl{ font-size:12px; min-width:480px; }
 
   /* Page-head title word breaks on narrow screens instead of overflowing */
   .page-head h1{ word-break: break-word; overflow-wrap: anywhere; }
@@ -1382,7 +1376,7 @@ function bedPage_410() {
 
     <div class="bp-wide">
       <h3><span class="hnum">B</span>Companions · antagonists</h3>
-      <table class="comp-tbl">
+      <div class="comp-tbl-wrap"><table class="comp-tbl">
         <thead><tr><th>Crop</th><th>Plant with</th><th>Keep away from</th><th>Spacing</th></tr></thead>
         <tbody>
           <tr><td class="crop">Pepper</td><td class="good">Basil, onion, carrot, marigold</td><td class="bad">Beans next to them, brassicas, fennel</td><td class="sp">18 in</td></tr>
@@ -1392,7 +1386,7 @@ function bedPage_410() {
           <tr><td class="crop">Onion</td><td class="good">Carrot, beet, lettuce</td><td class="bad">Beans, peas</td><td class="sp">4 in</td></tr>
           <tr><td class="crop">Lettuce</td><td class="good">Carrot, onion, radish, strawberry</td><td class="bad">—</td><td class="sp">8 in</td></tr>
         </tbody>
-      </table>
+      </table></div>
     </div>
   `;
 }
@@ -1462,7 +1456,7 @@ function bedPage_39() {
 
     <div class="bp-wide">
       <h3><span class="hnum">B</span>Companions · antagonists</h3>
-      <table class="comp-tbl">
+      <div class="comp-tbl-wrap"><table class="comp-tbl">
         <thead><tr><th>Crop</th><th>Plant with</th><th>Keep away from</th><th>Spacing</th></tr></thead>
         <tbody>
           <tr><td class="crop">Pole bean</td><td class="good">Carrot, corn, radish, cucumber</td><td class="bad">Onion, garlic, pepper</td><td class="sp">6 in</td></tr>
@@ -1474,7 +1468,7 @@ function bedPage_39() {
           <tr><td class="crop">Lettuce</td><td class="good">Carrot, radish, strawberry, chive</td><td class="bad">—</td><td class="sp">8 in</td></tr>
           <tr><td class="crop">Radish</td><td class="good">Cucumber, lettuce, nasturtium</td><td class="bad">Hyssop</td><td class="sp">2 in</td></tr>
         </tbody>
-      </table>
+      </table></div>
     </div>
   `;
 }
@@ -1536,7 +1530,7 @@ function bedPage_33() {
 
     <div class="bp-wide">
       <h3><span class="hnum">B</span>Harvest notes</h3>
-      <table class="comp-tbl">
+      <div class="comp-tbl-wrap"><table class="comp-tbl">
         <thead><tr><th>Herb</th><th>Cut technique</th><th>Best for</th><th>Varieties</th></tr></thead>
         <tbody>
           <tr><td class="crop">Basil</td><td>Pinch top two leaves weekly — never pull whole stem</td><td class="good">Pesto, caprese, Thai, pizza</td><td class="sp">Genovese, Thai</td></tr>
@@ -1545,7 +1539,7 @@ function bedPage_33() {
           <tr><td class="crop">Thyme</td><td>Strip sprigs · never cut woody base</td><td class="good">Braises, roasts, stock</td><td class="sp">English, lemon</td></tr>
           <tr><td class="crop">Oregano</td><td>Cut stems at 6 in; dries well</td><td class="good">Tomato sauce, pizza, bean soup</td><td class="sp">Greek, Italian</td></tr>
         </tbody>
-      </table>
+      </table></div>
     </div>
   `;
 }
@@ -1631,7 +1625,7 @@ function bedPage_pots() {
 
     <div class="bp-wide">
       <h3><span class="hnum">B</span>Care checklist</h3>
-      <table class="comp-tbl">
+      <div class="comp-tbl-wrap"><table class="comp-tbl">
         <thead><tr><th>Task</th><th>Cadence</th><th>Why</th></tr></thead>
         <tbody>
           <tr><td class="crop">Water</td><td class="good">Daily in July–Aug; twice if 85°F+</td><td>Pots dry fast; inconsistent water → blossom-end rot</td></tr>
@@ -1640,7 +1634,7 @@ function bedPage_pots() {
           <tr><td class="crop">Tie</td><td class="good">Weekly</td><td>Stem weight compounds fast once fruiting</td></tr>
           <tr><td class="crop">Underplant</td><td class="good">Basil or marigold at transplant</td><td>Flavor + pest deterrent + living mulch</td></tr>
         </tbody>
-      </table>
+      </table></div>
     </div>
   `;
 }
