@@ -776,17 +776,43 @@ body.site{
 .site-main .bed{ min-width: 0; }
 
 @media (max-width: 880px){
-  /* Bed diagrams: let them fill the column width and scale vertically.
-     Explicit width:100% avoids iOS Safari quirks with width:auto + viewBox
-     (which sometimes falls back to the 300px default and anchors right). */
-  .site-main .bp-diagram{ text-align:center; }
+  /* Bed diagrams on mobile: constrain with !important so any stale cached
+     rules (display:flex, width:auto, max-height:68vh from earlier
+     iterations) can't anchor the SVG to the right edge. The detailed
+     plant/spacing list in the aside below is the primary reading surface;
+     the diagram is a reference thumbnail. */
+  .site-main .bed-page-body{
+    display:block !important;
+    grid-template-columns:none !important;
+  }
+  .site-main .bp-diagram{
+    display:block !important;
+    width:100% !important;
+    max-width:100% !important;
+    margin:0 0 18px !important;
+    padding:0 !important;
+    text-align:center !important;
+    float:none !important;
+    position:static !important;
+    background:none !important;
+    border:0 !important;
+  }
   .site-main .bp-diagram > svg,
-  .site-main .bp-diagram svg.bed-svg{
-    display:block;
-    width:100%;
-    max-width:100%;
-    height:auto;
-    margin:0 auto;
+  .site-main .bp-diagram svg.bed-svg,
+  .site-main svg.bed-svg{
+    display:block !important;
+    width:100% !important;
+    max-width:320px !important;
+    height:auto !important;
+    margin:0 auto !important;
+    float:none !important;
+  }
+  .site-main .bp-aside{
+    border-left:0 !important;
+    padding-left:0 !important;
+    border-top:1px solid var(--rule) !important;
+    padding-top:18px !important;
+    margin-top:0 !important;
   }
 
   /* Succession timeline — horizontal scroll with the slot column pinned.
