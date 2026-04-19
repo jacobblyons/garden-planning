@@ -897,6 +897,10 @@ body.site{
 }
 
 @media (max-width: 880px){
+  /* iOS Safari creates phantom horizontal page scroll when .site-side
+     is position:fixed + transform:translateX(-100%). Cap it at the root. */
+  html, body{ overflow-x:hidden; max-width:100%; }
+
   /* Swap the desktop succession grid for the mobile card layout */
   .site-main .succ{ display:none; }
   .site-main .succ-mobile{ display:block; }
