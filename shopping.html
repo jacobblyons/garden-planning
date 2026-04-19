@@ -802,92 +802,111 @@ body.site{
 /* Simplify footer — site has its own sticky chrome */
 .site-main footer{display:none}
 
-/* ============ Responsive safety: keep visuals inside the viewport ============
-   Addresses overflow on narrow screens where:
-   - Tall bed SVGs stretched to full column width become unusable
-   - Grid items (bp-diagram/bp-aside) inherit min-content widths from children
-   - Fixed-column timelines push past the viewport edge
-*/
+/* ============ Responsive safety ============ */
 .site-main img,
 .site-main svg{ max-width: 100%; height: auto; }
 .site-main .bp-diagram,
 .site-main .bp-aside,
 .site-main .bed{ min-width: 0; }
 
+/* The mobile succession layout is hidden by default; the @media block below
+   swaps the desktop grid for it on narrow screens. */
+.site-main .succ-mobile{ display:none; }
+
+/* Mobile card styles — one card per slot, each with its own month strip.
+   Styles live outside the @media block so the cascade is simple; the
+   display:none above keeps them hidden on desktop. */
+.site-main .succ-mobile-wrap{
+  border:1px solid var(--rule);
+  background:var(--paper-2);
+  padding:14px 14px 6px;
+}
+.site-main .succ-mobile-legend{
+  font-family:"JetBrains Mono",monospace;
+  font-size:9.5px;
+  letter-spacing:0.08em;
+  color:var(--ink-2);
+  padding-bottom:10px;
+  margin-bottom:8px;
+  border-bottom:1px dashed var(--rule);
+  display:flex;flex-wrap:wrap;gap:10px 14px;
+  line-height:1.4;
+}
+.site-main .succ-mobile-legend b{
+  font-family:"Fraunces",serif;font-style:italic;font-weight:500;font-size:11px;
+  color:var(--ink);letter-spacing:0;margin-right:3px;
+}
+.site-main .succ-mobile-legend .lg-arrow{color:var(--ink);font-weight:700;margin-right:2px}
+.site-main .succ-mobile-legend .lg-dash{
+  display:inline-block;width:18px;height:0;border-top:1px dashed var(--ink);
+  vertical-align:middle;margin-right:4px;transform:translateY(-2px);
+}
+.site-main .succ-mobile-legend .lg-chip{
+  display:inline-block;width:12px;height:9px;border:1px solid #1f2a20;
+  background:#f2c94c;vertical-align:-1px;margin-right:3px;
+}
+.site-main .succ-card{
+  padding:12px 0 14px;
+  border-bottom:1px dotted var(--rule);
+}
+.site-main .succ-card:last-child{ border-bottom:0; padding-bottom:4px; }
+.site-main .succ-card-title{
+  font-family:"Fraunces",serif;
+  font-weight:500;font-style:italic;
+  font-size:16px;color:var(--ink);line-height:1.2;
+}
+.site-main .succ-card-tag{
+  font-family:"JetBrains Mono",monospace;
+  font-size:9px;letter-spacing:0.14em;text-transform:uppercase;
+  color:var(--ink-2);margin:3px 0 10px;
+}
+.site-main .succ-card-months{
+  display:grid;grid-template-columns:repeat(9,1fr);
+  font-family:"JetBrains Mono",monospace;
+  font-size:8.5px;letter-spacing:0.04em;color:var(--ink-2);
+  margin-bottom:4px;
+}
+.site-main .succ-card-months span{ text-align:center; padding:2px 0; }
+.site-main .succ-card-track{
+  position:relative;
+  height:30px;
+  background:rgba(0,0,0,0.02);
+  border:1px solid rgba(31,42,32,0.1);
+  border-radius:2px;
+}
+.site-main .succ-card-track.two-lane{ height:42px; }
+.site-main .succ-card-track .grid{
+  position:absolute; inset:0;
+  display:grid; grid-template-columns:repeat(9,1fr);
+  pointer-events:none;
+}
+.site-main .succ-card-track .grid > span{
+  border-left:1px dashed rgba(31,42,32,0.12);
+}
+.site-main .succ-card-track .grid > span:first-child{ border-left:0; }
+.site-main .succ-card-notes{
+  margin-top:6px;
+  font-family:"JetBrains Mono",monospace;
+  font-size:9.5px;letter-spacing:0.04em;
+  color:var(--ink-2);
+  line-height:1.5;
+}
+.site-main .succ-card-notes b{
+  color:var(--ink);font-family:"Fraunces",serif;font-style:italic;
+  font-weight:500;font-size:12px;letter-spacing:0;
+}
+
 @media (max-width: 880px){
-  /* Bed diagrams on mobile: constrain with !important so any stale cached
-     rules (display:flex, width:auto, max-height:68vh from earlier
-     iterations) can't anchor the SVG to the right edge. The detailed
-     plant/spacing list in the aside below is the primary reading surface;
-     the diagram is a reference thumbnail. */
-  .site-main .bed-page-body{
-    display:block !important;
-    grid-template-columns:none !important;
-  }
-  .site-main .bp-diagram{
-    display:block !important;
-    width:100% !important;
-    max-width:100% !important;
-    margin:0 0 18px !important;
-    padding:0 !important;
-    text-align:center !important;
-    float:none !important;
-    position:static !important;
-    background:none !important;
-    border:0 !important;
-  }
-  .site-main .bp-diagram > svg,
-  .site-main .bp-diagram svg.bed-svg,
-  .site-main svg.bed-svg{
-    display:block !important;
-    width:100% !important;
-    max-width:320px !important;
-    height:auto !important;
-    margin:0 auto !important;
-    float:none !important;
-  }
-  .site-main .bp-aside{
-    border-left:0 !important;
-    padding-left:0 !important;
-    border-top:1px solid var(--rule) !important;
-    padding-top:18px !important;
-    margin-top:0 !important;
-  }
+  /* Swap the desktop succession grid for the mobile card layout */
+  .site-main .succ{ display:none; }
+  .site-main .succ-mobile{ display:block; }
 
-  /* Succession timeline — horizontal scroll with the slot column pinned.
-     touch-action: pan-x pan-y tells iOS this element owns horizontal panning
-     so the gesture isn't swallowed by the page's vertical scroll. */
-  .site-main .succ{
-    overflow-x:auto;
-    overflow-y:hidden;
-    -webkit-overflow-scrolling:touch;
-    touch-action: pan-x pan-y;
-    scrollbar-gutter:stable;
-  }
-  .site-main .succ-head,
-  .site-main .succ-row{ min-width:720px; }
-  .site-main .succ-head{
-    grid-template-columns: 130px repeat(9, minmax(52px, 1fr)) 10px;
-  }
-  .site-main .succ-row{ grid-template-columns: 130px 1fr; }
-  .site-main .succ-head .sh.first,
-  .site-main .succ-slot{
-    position:sticky;
-    left:0;
-    background:var(--paper-2);
-    z-index:2;
-    box-shadow:1px 0 0 var(--rule);
-  }
-  .site-main .succ-slot{ font-size:12px; padding-right:10px; padding-left:2px; }
-  .site-main .succ-slot .tag{ font-size:8px; }
-
-  /* Companion table scrolls horizontally inside its own wrapper so wide rows
-     don't force the page to scroll. We wrap at render time via JS below. */
+  /* Wide companion table scrolls in its own wrapper */
   .site-main .comp-tbl-wrap{ overflow-x:auto; -webkit-overflow-scrolling:touch; }
   .site-main .comp-tbl{ font-size:12px; min-width:480px; }
 
-  /* Page-head title word breaks on narrow screens instead of overflowing */
-  .page-head h1{ word-break: break-word; overflow-wrap: anywhere; }
+  /* Long headings wrap instead of overflowing */
+  .page-head h1{ word-break:break-word; overflow-wrap:anywhere; }
 }
 
 </style>
@@ -1312,7 +1331,102 @@ function succession(slots) {
     }
     rows += '</div></div>';
   }
-  return `<div class="succ">${legend}${head}${rows}</div>`;
+
+  // ----- Mobile card version ------------------------------------------------
+  // One card per slot. Each card: title + tag + a 9-cell month strip +
+  // a full-width track with crop bars positioned by month, plus a text
+  // summary line per crop so narrow bars don't have to carry all the info.
+  const MONTHS_ABBR = ['Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov'];
+  let mobileCards = '';
+  for (const s of slots) {
+    const lanes = [];
+    const assigned = s.crops.map(c => {
+      for (let li = 0; li < lanes.length; li++) {
+        if (c.start >= lanes[li]) { lanes[li] = c.end; return li; }
+      }
+      lanes.push(c.end); return lanes.length - 1;
+    });
+    const twoLane = lanes.length > 1;
+
+    let bars = '<div class="grid">' + '<span></span>'.repeat(9) + '</div>';
+    for (let i = 0; i < s.crops.length; i++) {
+      const c = s.crops[i];
+      const lane = assigned[i];
+      const leftPct = (c.start / 9) * 100;
+      const widthPct = ((c.end - c.start) / 9) * 100;
+      const top = twoLane ? (lane === 0 ? 3 : 21) : 7;
+      const hasPeak = Array.isArray(c.peak) && c.peak.length === 2;
+      bars += `<div class="succ-bar ${c.color}${hasPeak ? ' has-peak' : ''}" style="left:${leftPct}%;width:calc(${widthPct}% - 2px);top:${top}px">${c.name}</div>`;
+      if (hasPeak) {
+        const pStart = Math.max(c.peak[0], c.start);
+        const pEnd = Math.min(c.peak[1], c.end);
+        if (pEnd > pStart) {
+          const pLeft = (pStart / 9) * 100;
+          const pWidth = ((pEnd - pStart) / 9) * 100;
+          const showText = (pEnd - pStart) >= 1.8;
+          const pLabel = showText ? 'PICK' : '◆';
+          const peakClass = showText ? 'succ-peak with-dot' : 'succ-peak';
+          bars += `<div class="${peakClass}" style="left:${pLeft}%;width:calc(${pWidth}% - 2px);top:${top}px">${pLabel}</div>`;
+        }
+      }
+    }
+    for (let li = 0; li < lanes.length; li++) {
+      const inLane = s.crops.map((c, i) => ({c, i})).filter(x => assigned[x.i] === li);
+      for (let k = 1; k < inLane.length; k++) {
+        const prev = inLane[k-1].c, next = inLane[k].c;
+        if (next.start >= prev.end) {
+          const gap = next.start - prev.end;
+          const top = twoLane ? (li === 0 ? 3 : 21) : 7;
+          if (gap >= 2) {
+            const leftPct = (prev.end / 9) * 100;
+            const widthPct = (gap / 9) * 100;
+            bars += `<div class="succ-gap" style="left:${leftPct}%;width:${widthPct}%;top:${top}px">${next.gapLabel || ''}</div>`;
+          } else {
+            const atPct = (prev.end / 9) * 100;
+            bars += `<div class="succ-arrow" style="left:${atPct}%;top:${top + 1}px">▶</div>`;
+          }
+        }
+      }
+    }
+
+    // Text summary: `Pepper + basil · May → Oct · peak Jul`
+    const cropLines = s.crops.map(c => {
+      const from = MONTHS_ABBR[c.start] || '';
+      const endIdx = Math.max(0, Math.min(c.end - 1, MONTHS_ABBR.length - 1));
+      const to = MONTHS_ABBR[endIdx] || '';
+      const range = from === to ? from : `${from} → ${to}`;
+      const parts = [range];
+      if (Array.isArray(c.peak) && c.peak.length === 2) {
+        const pA = MONTHS_ABBR[Math.floor(c.peak[0])] || '';
+        const pB = MONTHS_ABBR[Math.min(MONTHS_ABBR.length - 1, Math.max(0, Math.floor(c.peak[1]) - 1))] || '';
+        parts.push(pA === pB ? `peak ${pA}` : `peak ${pA}–${pB}`);
+      }
+      if (c.endLabel) parts.push(c.endLabel);
+      if (c.gapLabel) parts.push(`<em>${c.gapLabel}</em>`);
+      return `<div><b>${c.name}</b> ${parts.join(' · ')}</div>`;
+    }).join('');
+
+    const monthRow = MONTHS_ABBR.map(m => `<span>${m.toUpperCase()}</span>`).join('');
+    mobileCards += `
+      <div class="succ-card">
+        <div class="succ-card-title">${s.slot}</div>
+        <div class="succ-card-tag">${s.tag}</div>
+        <div class="succ-card-months">${monthRow}</div>
+        <div class="succ-card-track${twoLane ? ' two-lane' : ''}">${bars}</div>
+        <div class="succ-card-notes">${cropLines}</div>
+      </div>`;
+  }
+
+  const mobileLegend = `<div class="succ-mobile-legend">
+    <span><b>Slot</b> a patch of bed</span>
+    <span><span class="lg-arrow">▶</span> crop swap</span>
+    <span><span class="lg-dash"></span> gap</span>
+    <span><span class="lg-chip"></span>peak pick window</span>
+  </div>`;
+
+  const desktop = `<div class="succ">${legend}${head}${rows}</div>`;
+  const mobile  = `<div class="succ-mobile"><div class="succ-mobile-wrap">${mobileLegend}${mobileCards}</div></div>`;
+  return desktop + mobile;
 }
 
 function bedPage_410() {
