@@ -763,6 +763,45 @@ body.site{
 /* Simplify footer — site has its own sticky chrome */
 .site-main footer{display:none}
 
+/* ============ Responsive safety: keep visuals inside the viewport ============
+   Addresses overflow on narrow screens where:
+   - Tall bed SVGs stretched to full column width become unusable
+   - Grid items (bp-diagram/bp-aside) inherit min-content widths from children
+   - Fixed-column timelines push past the viewport edge
+*/
+.site-main img,
+.site-main svg{ max-width: 100%; height: auto; }
+.site-main .bp-diagram,
+.site-main .bp-aside,
+.site-main .bed{ min-width: 0; }
+
+@media (max-width: 880px){
+  html, body{ overflow-x: hidden; }
+
+  /* Center bed diagrams and cap height so 4×10 portrait SVGs don't dominate */
+  .site-main .bp-diagram{ display:flex; justify-content:center; }
+  .site-main .bp-diagram > svg,
+  .site-main .bp-diagram svg.bed-svg{
+    width:auto;
+    max-width:100%;
+    max-height:68vh;
+  }
+
+  /* Wide timelines & tables scroll horizontally rather than bleeding off-screen */
+  .site-main .succ,
+  .site-main .comp-tbl{ overflow-x:auto; -webkit-overflow-scrolling:touch; }
+  .site-main .succ-head{
+    grid-template-columns: 110px repeat(9, minmax(22px, 1fr)) 10px;
+    font-size:9px; letter-spacing:0.08em;
+  }
+  .site-main .succ-row{ grid-template-columns: 110px 1fr; }
+  .site-main .succ-slot{ font-size:12px; padding-right:8px }
+  .site-main .succ-slot .tag{ font-size:8px }
+
+  /* Page-head title word breaks on narrow screens instead of overflowing */
+  .page-head h1{ word-break: break-word; overflow-wrap: anywhere; }
+}
+
 </style>
 </head>
 <body class="site" data-tab="bed-3x9" data-season="spring-2026">
@@ -2029,8 +2068,6 @@ window.GardenPlan = {
 
   const seasons = [
     { key:'spring-2026', label:'Spring / Summer', sub:'2026', active:true },
-    { key:'fall-2026',   label:'Fall / Winter',   sub:'2026', disabled:true },
-    { key:'2027',        label:'Next year',       sub:'2027 — planning', disabled:true },
   ];
 
   const body = document.body;
