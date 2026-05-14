@@ -10,9 +10,16 @@ Static site for the 2026 spring/summer vegetable garden plan. Covers bed layouts
 - `harvest.html` — harvest cues
 - `shopping.html` — shopping list
 
+## Layout
+
+- `styles.css` — all styles, shared by every page
+- `js/garden-plan.js` — the renderer (bed SVGs, succession calendar, shopping list, harvest cues). Exposes `window.GardenPlan`.
+- `js/site-chrome.js` — sidebar / top-tab shell injected around each page's `<main>`
+- Each HTML page is a thin shell that defines `window.__mount` for its body, then loads the two shared JS files
+
 ## Hosting
 
-Served via GitHub Pages. `.nojekyll` disables Jekyll processing. To view locally, open `index.html` in a browser, or:
+Served via GitHub Pages. `.nojekyll` disables Jekyll processing. To view locally:
 
 ```
 python3 -m http.server 8000
